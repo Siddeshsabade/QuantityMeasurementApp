@@ -102,19 +102,18 @@ public class QuantityMeasurementApp {
 
 
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Enter first value:");
         double v1 = sc.nextDouble();
 
-        System.out.println("Enter first unit (FEET / INCHES):");
+        System.out.println("Enter first unit (FEET / INCHES / YARDS / CMS):");
         Length.Unit u1 = Length.Unit.valueOf(sc.next().toUpperCase());
 
         System.out.println("Enter second value:");
         double v2 = sc.nextDouble();
 
-        System.out.println("Enter second unit (FEET / INCHES):");
+        System.out.println("Enter second unit (FEET / INCHES / YARDS / CMS):");
         Length.Unit u2 = Length.Unit.valueOf(sc.next().toUpperCase());
 
         Length l1 = new Length(v1, u1);
