@@ -1,81 +1,120 @@
 package org.example;
 
-public class Length{
+public class Length {
+    private final double value;
+    private final LengthUnit unit;
 
-    private double value;
-    private LengthUnit unit;
 
-    public enum LengthUnit{
-        FEET(12.0),
-        INCHES(1.0),
-        YARD(36.0),
-        CM(0.393701);
+    public boolean compare(Length other) {
+        if (other == null) return false;
+        double epsilon = 0.0001; // tolerance
+
+        return Math.abs(this.toBaseUnit() - other.toBaseUnit()) < epsilon;
+    }
+
+    public double convertToBaseUnit() {
+        return convertToBaseUnit();
+    }
+
+
+    public enum LengthUnit
+    {
+        Feet(12.0), // 1 feet= 12 inchs
+        Inches(1.0),
+        Yards(36.0),  // 1 yard = 3 inches = 36 feet
+        Centimeters(0.3937);
+
 
         private final double conversionFactor;
-        LengthUnit(double conversionFactor){
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double conversionFactor)
+        {
+            this.conversionFactor=conversionFactor;
         }
-        public double getConversionFactor(){
+
+        public double toInches(double value) {
+            return value * conversionFactor;
+        }
+        public double fromInches(double inches) {
+            return inches / conversionFactor;
+        }
+
+
+
+        public double getConversionFactor()
+        {
             return conversionFactor;
         }
     }
 
-    public Length(double value, LengthUnit unit){
-        this.value = value;
-        this.unit = unit;
-    }
-
-    // convert to inches
-    private double convertToBaseUnit(){
-        return this.value * this.unit.getConversionFactor();
-    }
-
-/*    public static double convertToBaseUnit(Length source){
-
-        if (source == null) {
-            throw new IllegalArgumentException("Source Length cannot be null");
+    public Length(double value,LengthUnit unit)
+    {
+        if(unit==null){
+            throw new IllegalArgumentException("please enter valid unit");
         }
-        return source.value*source.unit.getConversionFactor();
-    }*/
+        this.value=value;
+        this.unit=unit;
+    }
+
+    // Convert to base unit (inches)
+    public double toBaseUnit() {
+        return unit.toInches(value);
+    }
 
     @Override
-    public String toString() {
-        return String.format("%.2f %s", value, unit);
+    public boolean equals(Object obj)
+    {
+        boolean result=false;
+        if(this==obj) return true;
+        if(obj==null) return false;
+
+        Length other =(Length) obj;
+        return compare(other);
     }
-
-    public Length convertTo(LengthUnit toUnit){
-
-        double inches = convertToBaseUnit();
-        double convertedValue=inches/toUnit.getConversionFactor();
-        return new Length(convertedValue, toUnit);
-    }
-
-    public static Length demonstrateLengthConversion(Length fromUnit ,LengthUnit toUnit){
-        return fromUnit.convertTo(toUnit);
-    }
-    @Override
-    public  boolean equals(Object obj){
-        boolean boolResult = false;
-
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (!(obj instanceof Length)) return false;
-
-        // typecasting
-        Length val2 = (Length) obj;
-        double value1 = this.convertToBaseUnit();
-        double value2 = val2.convertToBaseUnit();
-        int result = Double.compare(value1,value2);
-
-        if(result == 0){
-            boolResult = true;
+    // conversion logic
+    public static double convert(double value,LengthUnit sourceUnit,LengthUnit targetUnit)
+    {
+        if(sourceUnit==null || targetUnit==null){
+            throw new IllegalArgumentException("source & target unit must not be null");
         }
-        return boolResult;
+        double inches = sourceUnit.toInches(value);
+        return targetUnit.fromInches(inches);
+    }
+    //parsew logic
+    public static LengthUnit parseUnit(String input) {
+        if (input == null) return null;
+        String s = input.trim().toLowerCase();
+        switch (s) {
+            case "feet":
+            case "ft":
+                return LengthUnit.Feet;
+
+            case "inch":
+            case "in":
+                return LengthUnit.Inches;
+
+            case "yard":
+            case "yd":
+                return LengthUnit.Yards;
+
+            case "centimeter":
+            case "cm":
+                return LengthUnit.Centimeters;
+
+            default:
+                return null;
+        }
     }
 
-    public static Length Addition(Length Length1, Length Length2){
-        Length convertedLength2 = demonstrateLengthConversion(Length2,Length1.unit);
-        double combinedValue = Length1.value + convertedLength2.value;
-        return new Length(combinedValue,Length1.unit);
+    /** Short label for printing results. */
+    public static String unitLabel(LengthUnit u) {
+        switch (u) {
+            case Feet: return "ft";
+            case Inches: return "in";
+            case Yards: return "yd";
+            case Centimeters: return "cm";
+            default: return u.name();
+        }
     }
+
+
 }
